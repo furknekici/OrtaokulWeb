@@ -34,7 +34,7 @@ class Sinif(Temel):
     __tablename__ = "sinif"
     kacinci_sinif: Mapped[SinifYili] = mapped_column(String(5), nullable=False, default='', index=True)
     sube: Mapped[str] = mapped_column(String(5), nullable=False, default='', index=True)
-    sinif_ogrencileri: Mapped[list['Ogrenci']] = relationship(back_populates="sinif", lazy='selectin')
+    ogrenciler: Mapped[list['Ogrenci']] = relationship(back_populates="sinif", lazy='selectin')
     ogretmen_id: Mapped[UUID] = mapped_column(ForeignKey('ogretmen.id'))
     ogretmen: Mapped[Ogretmen] = relationship(back_populates="sinifi")
 
