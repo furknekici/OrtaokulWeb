@@ -1,6 +1,15 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
-app = FastAPI()
+from database import db
+
+@asynccontextmanager
+async def life_span(app: FastAPI):
+    db.connect("postgresql+asyncpg://fiko:271453@127.0.0.1:5432/ogrenci")
+    yield
+    db.disconnect()
+app = FastAPI(lifespan=life_span)
 
 
 @app.get("/")

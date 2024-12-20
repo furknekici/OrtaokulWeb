@@ -9,7 +9,7 @@ class Database:
         self.__engine = None
 
 
-    def connect(self, db_url: str = None):
+    async def connect(self, db_url: str = None):
         self.__engine = create_async_engine(db_url)
         self.__session = async_sessionmaker(bind=self.__engine, autocommit=False)
 
