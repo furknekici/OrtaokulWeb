@@ -11,7 +11,7 @@ class TemelSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID | None = None
     olusturma_zamani: datetime | None = None
-    guncelleme_zamani: datetime | None = None
+    guncelleme_zaman: datetime | None = None
 
 
 class OgretmenSchema(TemelSchema):
