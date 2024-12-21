@@ -57,7 +57,7 @@ class Ogrenci(Temel):
     veli_id: Mapped[UUID] = mapped_column(ForeignKey('veli.id'))
     veli: Mapped[Veli] = relationship(back_populates='ogrenciler')
     sinif_id: Mapped[UUID] = mapped_column(ForeignKey('sinif.id'))
-    sinif: Mapped[Sinif] = relationship(back_populates='sinif_ogrencileri')
+    sinif: Mapped[Sinif] = relationship(back_populates='ogrenciler')
 
 class Ders(Temel):
     __tablename__ = "ders"
