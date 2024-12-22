@@ -1,18 +1,24 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter
+from fastapi.params import Query
 from sqlalchemy import select
 
 from database import Db_Bagimlilik
+from schemas.schemas import SorguSchema
 
 
 def genel_api_olusturucu(adres: str , etiketler: list[str], schema: type, model: type):
     api_router = APIRouter(prefix=adres, tags=etiketler)
 
     @api_router.get("/")
-    async def tum_veri(vt: Db_Bagimlilik) -> list[schema]:
-        ogretmenler = (await vt.execute(select(model))).scalars().all()
-        return ogretmenler
+    async def tum_veri(vt: Db_Bagimlilik, sorgu_param:Annotated[SorguSchema, Query()]) -> list[schema]:
+        sorgu = select(model)
+        sorgu = sorgu.limit(sorgu_param.kayit_sayisi)
+        sorgu = sorgu.offset(sorgu_param.kayit_sayisi*sorgu_param.sayfa)
+        sorgu_sonucu = await vt.execute(sorgu)
+        return sorgu_sonucu.scalars().all()
 
     @api_router.post("/")
     async def veri_ekle(vt: Db_Bagimlilik, ogretmen: schema) -> schema:

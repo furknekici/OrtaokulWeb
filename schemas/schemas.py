@@ -6,6 +6,13 @@ from pydantic import BaseModel, ConfigDict
 from pydantic.v1 import Field
 from database.modeller import SinifYili, Cinsiyet
 
+class SorguSchema(BaseModel):
+    sayfa: int = Field(default=0, ge=0)
+    kayit_sayisi: int = Field(default=10, ge=5, le=100)
+
+
+
+
 
 class TemelSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
