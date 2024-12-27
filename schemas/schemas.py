@@ -1,24 +1,26 @@
-
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict
-from pydantic.v1 import Field
+from pydantic import BaseModel, ConfigDict, Field
 from database.modeller import SinifYili, Cinsiyet
+
+
 
 class SorguSchema(BaseModel):
     sayfa: int = Field(default=0, ge=0)
     kayit_sayisi: int = Field(default=10, ge=5, le=100)
-
-
-
+    #Sıralama Kuralları:
+    #Sıralamayı dizi olarak alacağız
+    #Her bir eleman sıralanacak alanın adını ve yönünü içermeli
+    # + ve - işaretleri alan adanını önüne gelerek artan veya azalan sıralamayı ifade eder.
+    siralama : list[str] = Field(default_factory=list)
 
 
 class TemelSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: UUID | None = None
-    olusturma_zamani: datetime | None = None
-    guncelleme_zaman: datetime | None = None
+    id: Optional[UUID] = None
+    olusturma_zamani: Optional[datetime] = None
+    guncelleme_zaman: Optional[datetime] = None
 
 
 class OgretmenSchema(TemelSchema):
@@ -29,12 +31,14 @@ class OgretmenSchema(TemelSchema):
     dogum_tarihi: datetime
     brans: str
 
+
 class OgretmenWithSinifSchema(OgretmenSchema):
     sinifi: Optional[list['SinifSchema']] = Field(default_factory=list)
 
 
 class OgretmenWithDersSchema(OgretmenSchema):
-    dersler: list['DersSchema'] = Field(default_factory=list)
+    dersler: Optional[list['DersSchema']] = Field(default_factory=list)
+
 
 class SinifSchema(TemelSchema):
     kacinci_sinif: SinifYili
@@ -43,7 +47,8 @@ class SinifSchema(TemelSchema):
 
 
 class SinifWithOgrenci(SinifSchema):
-    ogrenciler: list['OgrenciSchema'] = Field(default_factory=list)
+    ogrenciler: Optional[list['OgrenciSchema']] = Field(default_factory=list)
+
 
 class VeliSchema(TemelSchema):
     adi: str
@@ -53,7 +58,7 @@ class VeliSchema(TemelSchema):
 
 
 class VeliWithOgrenciSchema(VeliSchema):
-    ogrenciler: list['OgrenciSchema'] = Field(default_factory=list)
+    ogrenciler: Optional[list['OgrenciSchema']] = Field(default_factory=list)
 
 
 class OgrenciSchema(TemelSchema):
@@ -70,3 +75,5 @@ class OgrenciSchema(TemelSchema):
 class DersSchema(TemelSchema):
     adi: str
     ogretmen_id: UUID
+
+

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.params import Query
-from sqlalchemy import select
+from sqlalchemy import select, inspect
 
 from database import Db_Bagimlilik
 from schemas.schemas import SorguSchema
@@ -12,13 +12,31 @@ from schemas.schemas import SorguSchema
 def genel_api_olusturucu(adres: str , etiketler: list[str], schema: type, model: type):
     api_router = APIRouter(prefix=adres, tags=etiketler)
 
+    async def sorgulama(sorgu_param):
+        sorgu = select(model)
+        if len(sorgu_param.siralama) > 0:
+            model_bilgileri = inspect(model)
+            model_sutunlari = set([c.name for c in model_bilgileri.columns])
+            for siralama_sutunu in sorgu_param.siralama:
+                yon = siralama_sutunu[0]
+                sutun = siralama_sutunu[1:]
+                if sutun in model_sutunlari:
+                    vt_sutunu = getattr(model, sutun)
+                    if yon == "-":
+                        sorgu = sorgu.order_by(vt_sutunu.desc())
+                    elif yon == "+":
+                        sorgu = sorgu.order_by(vt_sutunu.asc())
+
+        sorgu = sorgu.limit(sorgu_param.kayit_sayisi)
+        sorgu = sorgu.offset(sorgu_param.kayit_sayisi * sorgu_param.sayfa)
+        return sorgu
+
     @api_router.get("/")
     async def tum_veri(vt: Db_Bagimlilik, sorgu_param:Annotated[SorguSchema, Query()]) -> list[schema]:
-        sorgu = select(model)
-        sorgu = sorgu.limit(sorgu_param.kayit_sayisi)
-        sorgu = sorgu.offset(sorgu_param.kayit_sayisi*sorgu_param.sayfa)
+        sorgu = await sorgulama(sorgu_param)
         sorgu_sonucu = await vt.execute(sorgu)
         return sorgu_sonucu.scalars().all()
+
 
     @api_router.post("/")
     async def veri_ekle(vt: Db_Bagimlilik, ogretmen: schema) -> schema:
