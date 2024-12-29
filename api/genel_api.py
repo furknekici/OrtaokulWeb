@@ -26,7 +26,6 @@ def genel_api_olusturucu(adres: str , etiketler: list[str], schema: type, model:
                         sorgu = sorgu.order_by(vt_sutunu.desc())
                     elif yon == "+":
                         sorgu = sorgu.order_by(vt_sutunu.asc())
-
         sorgu = sorgu.limit(sorgu_param.kayit_sayisi)
         sorgu = sorgu.offset(sorgu_param.kayit_sayisi * sorgu_param.sayfa)
         return sorgu

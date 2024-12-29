@@ -77,3 +77,9 @@ class DersSchema(TemelSchema):
     ogretmen_id: UUID
 
 
+class Istatistik(BaseModel):
+    istatistik: int=0
+    istatistikadi: str = ""
+    simge: str = ""
+
+
